@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="English" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scfocus.focus &mdash; scfocus 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d32c1fe3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=959672f5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            scfocus
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../environment.html">environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../focus.html">focus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model.html">Model</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">scfocus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">scfocus.focus</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scfocus.focus</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.environment</span> <span class="kn">import</span> <span class="n">Env</span><span class="p">,</span> <span class="n">ReplayBuffer</span><span class="p">,</span> <span class="n">train_off_policy</span>
+<span class="kn">from</span> <span class="nn">.model</span> <span class="kn">import</span> <span class="n">SAC</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">minmax_scale</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>  
+
+<div class="viewcode-block" id="focus">
+<a class="viewcode-back" href="../../doc/scfocus.focus.focus.html#scfocus.focus.focus">[docs]</a>
+<span class="k">class</span> <span class="nc">focus</span><span class="p">:</span>  
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">    Focus class for performing advanced reinforcement learning-based analysis on single-cell data.  </span>
+
+<span class="sd">    This class utilizes the Soft Actor-Critic (SAC) reinforcement learning framework to enhance  </span>
+<span class="sd">    cell subtype discrimination and identify distinct lineage branches within single-cell data.  </span>
+<span class="sd">    It manages the environment, memory buffers, and the ensemble of SAC agents to train and evaluate  </span>
+<span class="sd">    the model over multiple episodes.  </span>
+
+<span class="sd">    Parameters  </span>
+<span class="sd">    ----------  </span>
+<span class="sd">    f : array-like  </span>
+<span class="sd">        Latent space of the original data, with shape (num_samples, num_features).  </span>
+<span class="sd">    hidden_dim : int, optional  </span>
+<span class="sd">        Number of hidden units in the neural networks, by default 128.  </span>
+<span class="sd">    n : int, optional  </span>
+<span class="sd">        Number of agents or parallel environments, by default 8.  </span>
+<span class="sd">    max_steps : int, optional  </span>
+<span class="sd">        Maximum number of steps per episode, by default 5.  </span>
+<span class="sd">    pct_samples : float, optional  </span>
+<span class="sd">        Percentage of samples to use for each state, by default 0.125.  </span>
+<span class="sd">    n_states : int, optional  </span>
+<span class="sd">        Number of state variables, by default 2.  </span>
+<span class="sd">    err_scale : float, optional  </span>
+<span class="sd">        Error scaling factor for reward calculation, by default 1.  </span>
+<span class="sd">    bins : int, optional  </span>
+<span class="sd">        Number of bins for histogram-based state discretization, by default 15.  </span>
+<span class="sd">    capacity : float, optional  </span>
+<span class="sd">        Capacity of the replay buffer, by default 1e4.  </span>
+<span class="sd">    actor_lr : float, optional  </span>
+<span class="sd">        Learning rate for the actor network, by default 1e-4.  </span>
+<span class="sd">    critic_lr : float, optional  </span>
+<span class="sd">        Learning rate for the critic network, by default 1e-3.  </span>
+<span class="sd">    alpha_lr : float, optional  </span>
+<span class="sd">        Learning rate for the entropy coefficient, by default 1e-4.  </span>
+<span class="sd">    target_entropy : float, optional  </span>
+<span class="sd">        Target entropy for the SAC algorithm, by default -1.  </span>
+<span class="sd">    tau : float, optional  </span>
+<span class="sd">        Soft update coefficient for target networks, by default 5e-3.  </span>
+<span class="sd">    gamma : float, optional  </span>
+<span class="sd">        Discount factor for future rewards, by default 0.99.  </span>
+<span class="sd">    num_episodes : int, optional  </span>
+<span class="sd">        Number of training episodes, by default 1000.  </span>
+<span class="sd">    batch_size : int, optional  </span>
+<span class="sd">        Batch size for training, by default 64.  </span>
+<span class="sd">    res : float, optional  </span>
+<span class="sd">        Resolution parameter for merging focus patterns, by default 0.05.  </span>
+<span class="sd">    device : torch.device, optional  </span>
+<span class="sd">        Device to run the computations on (e.g., CPU or GPU), by default torch.device(&#39;cpu&#39;).  </span>
+<span class="sd">    &quot;&quot;&quot;</span>  
+
+<div class="viewcode-block" id="focus.__init__">
+<a class="viewcode-back" href="../../doc/scfocus.focus.focus.html#scfocus.focus.focus.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">pct_samples</span><span class="o">=</span><span class="mf">.125</span><span class="p">,</span> <span class="n">n_states</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>   
+                 <span class="n">err_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">actor_lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">critic_lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>   
+                 <span class="n">alpha_lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">target_entropy</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">.99</span><span class="p">,</span>   
+                 <span class="n">num_episodes</span><span class="o">=</span><span class="mf">1e3</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Initialize the Focus class.  </span>
+
+<span class="sd">        Parameters  </span>
+<span class="sd">        ----------  </span>
+<span class="sd">        f : array-like  </span>
+<span class="sd">            Latent space of the original data, with shape (num_samples, num_features).  </span>
+<span class="sd">        hidden_dim : int, optional  </span>
+<span class="sd">            Number of hidden units in the neural networks, by default 128.  </span>
+<span class="sd">        n : int, optional  </span>
+<span class="sd">            Number of agents or parallel environments, by default 8.  </span>
+<span class="sd">        max_steps : int, optional  </span>
+<span class="sd">            Maximum number of steps per episode, by default 5.  </span>
+<span class="sd">        pct_samples : float, optional  </span>
+<span class="sd">            Percentage of samples to use for each state, by default 0.125.  </span>
+<span class="sd">        n_states : int, optional  </span>
+<span class="sd">            Number of state variables, by default 2.  </span>
+<span class="sd">        err_scale : float, optional  </span>
+<span class="sd">            Error scaling factor for reward calculation, by default 1.  </span>
+<span class="sd">        bins : int, optional  </span>
+<span class="sd">            Number of bins for histogram-based state discretization, by default 15.  </span>
+<span class="sd">        capacity : float, optional  </span>
+<span class="sd">            Capacity of the replay buffer, by default 1e4.  </span>
+<span class="sd">        actor_lr : float, optional  </span>
+<span class="sd">            Learning rate for the actor network, by default 1e-4.  </span>
+<span class="sd">        critic_lr : float, optional  </span>
+<span class="sd">            Learning rate for the critic network, by default 1e-3.  </span>
+<span class="sd">        alpha_lr : float, optional  </span>
+<span class="sd">            Learning rate for the entropy coefficient, by default 1e-4.  </span>
+<span class="sd">        target_entropy : float, optional  </span>
+<span class="sd">            Target entropy for the SAC algorithm, by default -1.  </span>
+<span class="sd">        tau : float, optional  </span>
+<span class="sd">            Soft update coefficient for target networks, by default 5e-3.  </span>
+<span class="sd">        gamma : float, optional  </span>
+<span class="sd">            Discount factor for future rewards, by default 0.99.  </span>
+<span class="sd">        num_episodes : int, optional  </span>
+<span class="sd">            Number of training episodes, by default 1000.  </span>
+<span class="sd">        batch_size : int, optional  </span>
+<span class="sd">            Batch size for training, by default 64.  </span>
+<span class="sd">        res : float, optional  </span>
+<span class="sd">            Resolution parameter for merging focus patterns, by default 0.05.  </span>
+<span class="sd">        device : torch.device, optional  </span>
+<span class="sd">            Device to run the computations on (e.g., CPU or GPU), by default torch.device(&#39;cpu&#39;).  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_d</span>        <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">bins</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_states</span> <span class="o">*</span> <span class="n">n</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>     <span class="o">=</span> <span class="n">hidden_dim</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_d</span>       <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_states</span> <span class="o">*</span> <span class="n">n</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span>   <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n_states</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">f</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n_states</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">actor_lr</span>       <span class="o">=</span> <span class="n">actor_lr</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">critic_lr</span>      <span class="o">=</span> <span class="n">critic_lr</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_lr</span>       <span class="o">=</span> <span class="n">alpha_lr</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_entropy</span> <span class="o">=</span> <span class="n">target_entropy</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>            <span class="o">=</span> <span class="n">tau</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>          <span class="o">=</span> <span class="n">gamma</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span>         <span class="o">=</span> <span class="n">device</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span>       <span class="o">=</span> <span class="n">capacity</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span>       <span class="o">=</span> <span class="p">[]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span>            <span class="o">=</span> <span class="n">Env</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">,</span> <span class="n">pct_samples</span><span class="p">,</span> <span class="n">n_states</span><span class="p">,</span> <span class="n">err_scale</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span>         <span class="o">=</span> <span class="p">[]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_steps</span>      <span class="o">=</span> <span class="n">max_steps</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_episodes</span>   <span class="o">=</span> <span class="n">num_episodes</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimal_size</span>   <span class="o">=</span> <span class="n">num_episodes</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">max_steps</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>     <span class="o">=</span> <span class="n">batch_size</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span>            <span class="o">=</span> <span class="n">res</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span>             <span class="o">=</span> <span class="p">[]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span>              <span class="o">=</span> <span class="p">[]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span>              <span class="o">=</span> <span class="p">[]</span>  </div>
+
+
+    <span class="k">def</span> <span class="nf">meta_focusing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Perform meta focusing by iteratively fitting the ensemble and refining focus.  </span>
+
+<span class="sd">        Parameters  </span>
+<span class="sd">        ----------  </span>
+<span class="sd">        n : int  </span>
+<span class="sd">            Number of meta focusing iterations to perform.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself for method chaining.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta_fit</span><span class="p">()</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">focus_fit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Meta focusing time used: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>  
+        <span class="k">return</span> <span class="bp">self</span>  
+
+    <span class="k">def</span> <span class="nf">meta_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Perform a single meta fitting step by training a new SAC agent and updating memory.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself for method chaining.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SAC</span><span class="p">(</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">state_d</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_d</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor_lr</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">critic_lr</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">alpha_lr</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_entropy</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span>  
+        <span class="p">))</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">))</span>  
+        <span class="n">r</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">train_off_policy</span><span class="p">(</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_episodes</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">minimal_size</span><span class="p">,</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>  
+        <span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>  
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Meta fitting time used: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>  
+        <span class="k">return</span> <span class="bp">self</span>  
+
+    <span class="k">def</span> <span class="nf">focus_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Fit the focus model over a specified number of episodes.  </span>
+
+<span class="sd">        This method iteratively updates the focus weights based on the actions taken by the  </span>
+<span class="sd">        SAC agent within the environment. It monitors the convergence by checking the  </span>
+<span class="sd">        change in weights and stops early if the change is below a threshold.  </span>
+
+<span class="sd">        Parameters  </span>
+<span class="sd">        ----------  </span>
+<span class="sd">        episodes : int  </span>
+<span class="sd">            Number of episodes to train the focus model.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself for method chaining.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="n">episode_weight</span> <span class="o">=</span> <span class="p">[]</span>  
+        <span class="k">with</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">episodes</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Focus fitting...&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>  
+            <span class="k">for</span> <span class="n">i_episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">episodes</span><span class="p">)):</span>  
+                <span class="n">ls_weights</span> <span class="o">=</span> <span class="p">[]</span>  
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>  
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_steps</span><span class="p">):</span>  
+                    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  
+                        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">take_action</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>  
+                    <span class="n">action</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>  
+                    <span class="n">mus</span> <span class="o">=</span> <span class="n">action</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>  
+                    <span class="n">logstds</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">):]</span>  
+                    <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">n_states</span>  
+                    <span class="n">bra_weights</span> <span class="o">=</span> <span class="p">[]</span>  
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>  
+                        <span class="n">mu</span> <span class="o">=</span> <span class="n">mus</span><span class="p">[</span><span class="n">L</span><span class="o">*</span><span class="n">j</span><span class="p">:</span><span class="n">L</span><span class="o">*</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>  
+                        <span class="n">logstd</span> <span class="o">=</span> <span class="n">logstds</span><span class="p">[</span><span class="n">L</span><span class="o">*</span><span class="n">j</span><span class="p">:</span><span class="n">L</span><span class="o">*</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>  
+                        <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logstd</span><span class="p">))</span>  
+                        <span class="n">mn</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">sigma</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">std</span><span class="p">))))</span>  
+                        <span class="n">weights</span> <span class="o">=</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="n">mn</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">f</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">n_states</span><span class="p">]))</span>  
+                        <span class="n">bra_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>  
+                    <span class="n">ls_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bra_weights</span><span class="p">)</span>  
+                    <span class="n">next_state</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>  
+                    <span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>  
+                <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ls_weights</span><span class="p">)</span>  
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  
+                    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">weights</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>  
+                    <span class="k">if</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">i_episode</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>  
+                        <span class="k">break</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ls_weights</span><span class="p">)</span>  
+                <span class="n">episode_weight</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ls_weights</span><span class="p">)</span>  
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">episode_weight</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>  
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>  
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Focus fitting time used: </span><span class="si">{</span><span class="p">(</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>  
+        <span class="k">return</span> <span class="bp">self</span>  
+
+    <span class="k">def</span> <span class="nf">merge_fp2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Merge focus patterns by performing two levels of merging.  </span>
+
+<span class="sd">        This method first calls `merge_fp` to perform initial merging of focus patterns,  </span>
+<span class="sd">        then concatenates all merged focus patterns into a single array for further processing.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself for method chaining.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_fp</span><span class="p">()</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mfp</span><span class="p">)]</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_fp</span><span class="p">()</span>  
+        <span class="k">return</span> <span class="bp">self</span>  
+
+    <span class="k">def</span> <span class="nf">merge_fp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Merge focus patterns based on similarity thresholds.  </span>
+
+<span class="sd">        This method groups focus patterns that have significant overlap based on the  </span>
+<span class="sd">        specified resolution parameter. It computes the mean of grouped focus patterns  </span>
+<span class="sd">        to create merged focus patterns.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself after merging focus patterns.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfp</span> <span class="o">=</span> <span class="p">[]</span>  
+        <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="p">:</span>  
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>  
+            <span class="n">ord_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="n">n</span><span class="p">:,</span> <span class="p">:]</span>  
+            <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>  
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  
+                <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">i</span> <span class="ow">in</span> <span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]):</span>  
+                    <span class="k">continue</span>  
+                <span class="n">g_</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>  
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">fp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>  
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ord_indices</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ord_indices</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])))</span> <span class="o">&gt;</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">n</span><span class="p">:</span>  
+                            <span class="n">g_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>  
+                    <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_</span><span class="p">)</span>  
+                <span class="k">else</span><span class="p">:</span>  
+                    <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_</span><span class="p">)</span>  
+            <span class="n">mfp</span> <span class="o">=</span> <span class="p">[]</span>  
+            <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>  
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  
+                    <span class="n">mfp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fp</span><span class="p">[:,</span> <span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>  
+                <span class="k">else</span><span class="p">:</span>  
+                    <span class="n">mfp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fp</span><span class="p">[:,</span> <span class="n">g</span><span class="p">])</span>  
+            <span class="n">mfp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">mfp</span><span class="p">)</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">mfp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mfp</span><span class="p">)</span>  
+        <span class="k">return</span> <span class="bp">self</span>  
+
+    <span class="k">def</span> <span class="nf">focus_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        Calculate entropy and pseudotime based on merged focus patterns.  </span>
+
+<span class="sd">        This method computes the entropy of the merged focus patterns and scales it to  </span>
+<span class="sd">        derive pseudotime values, which can be used for further analysis of cell differentiation trajectories.  </span>
+
+<span class="sd">        Returns  </span>
+<span class="sd">        -------  </span>
+<span class="sd">        self : Focus  </span>
+<span class="sd">            Returns the instance itself with updated entropy and pseudotime attributes.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">entropy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mfp</span> <span class="o">*</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mfp</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">pseudotime</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy</span><span class="p">)</span>  
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+        
+    
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Zeyu Fu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
