@@ -52,3 +52,9 @@ To identify distinct lineage branches within single-cell data, we employ the **S
 ``` bash
 pip install scfocus
 ```
+## **License**
+<p>
+    <a href="https://choosealicense.com/licenses/mit/" target="_blank">
+        <img alt="license" src="https://img.shields.io/github/license/PeterPonyu/scfocus?style=flat-square&color=brightgreen"/>
+    </a>
+</p>
