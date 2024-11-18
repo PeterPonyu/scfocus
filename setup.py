@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(  
     name='scfocus',  
-    version='0.0.2',  
+    version='0.0.4',  
     description='single cell reinforcement learning for focusing',  
     long_description=long_description,  
     long_description_content_type="text/markdown",  
@@ -15,13 +15,8 @@ setup(
     license='MIT',  
     packages=find_packages(),  
     install_requires=[  
-        'anndata>=0.8.0',  
-        'numpy>=1.23.5',  
-        'pandas>=1.5.2',  
-        'scikit-learn>=1.2.1',  
-        'torch>=1.13.1',  
-        'matplotlib>=3.6.3',  
-        'seaborn>=0.11.2',  
+    	'scanpy>=1.10.4',
+        'torch>=1.13.1',    
         'joblib>=1.2.0',  
         'tqdm>=4.64.1', 
         'streamlit>=1.24.0' 
