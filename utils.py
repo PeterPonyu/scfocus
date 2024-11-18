@@ -45,7 +45,6 @@ def run_focus(_embedding, n=6, pct_samples=.01, meta_focusing=3):
         focus.merge_fp2()
         st.success("scFocus completed!", icon="🎉")
     return focus.mfp[0]
-@st.cache_data   
 
 
 @st.cache_data

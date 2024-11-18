@@ -54,10 +54,11 @@ if st.session_state.adata is not None:
         mfp = run_focus(st.session_state.embedding, n_branch)
         st.session_state.adata.obsm['mfp'] = mfp
         for i in range(mfp.shape[1]):
-            st.session_state.adata.obs[f'Fate{i}'] = mfp[:,i]
+            st.session_state.adata.obs[f'Fate_{i}'] = mfp[:,i]
         st.session_state.processed = True
             
     if st.session_state.processed:
+    
         adata = st.session_state.adata
         with tempfile.NamedTemporaryFile(delete=False, suffix='.h5ad') as tmp_file:
             adata.write_h5ad(tmp_file.name)
@@ -66,21 +67,17 @@ if st.session_state.adata is not None:
             with open(tmp_file.name,'rb')as f:
                 buffer.write(f.read())
         buffer.seek(0)
- 
         st.sidebar.download_button(label="Download scFocus Processed Data",data=buffer,file_name='adata.h5ad',mime='application/x-h5ad')
-        joblib.dump(adata, 'data_focus')
-        st.success("Prepare for Download!")
-        
+
         color = st.selectbox('Please select the observation for coloring', options=list(st.session_state.adata.obs))
         sc.pl.umap(st.session_state.adata, color=color, show=False)
         fig = plt.gcf()
         st.pyplot(fig)
 
-    
         if st.sidebar.button("FateProbs"):
             sc.set_figure_params()
             mfp = st.session_state.adata.obsm['mfp']
-            sc.pl.umap(st.session_state.adata, color=[f'Fate{i}' for i in range(mfp.shape[1])], show=False)
+            sc.pl.umap(st.session_state.adata, color=[f'Fate_{i}' for i in range(mfp.shape[1])], show=False)
             fig = plt.gcf()
             st.pyplot(fig)
         
@@ -103,7 +100,7 @@ if st.session_state.adata is not None:
                 mfp2 = np.vstack(container)
                 fig = plt.figure(figsize=(5,5), dpi=300)
                 ax = sns.heatmap(mfp2, yticklabels=False, vmax=1, vmin=0, cmap='viridis')
-                ax.set_xticklabels([f'Fate{i}' for i in range(mfp2.shape[1])])
+                ax.set_xticklabels([f'Fate_{i}' for i in range(mfp2.shape[1])])
                 st.pyplot(fig)
         
      
