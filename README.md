@@ -55,6 +55,8 @@ pip install scfocus
 
 ## **Streamlit UI**
 
+Available on linux
+
 ```bash
 scfocus ui
 ```
