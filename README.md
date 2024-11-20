@@ -39,12 +39,6 @@ To identify distinct lineage branches within single-cell data, we employ the **S
   <img src="source/_static/Pattern.png" alt="Pattern Image" width="600"/>  
 </p>
 
-## **Documentation**
-
-[![Documentation Status](https://readthedocs.org/projects/scfocus/badge/?version=latest)](https://scfocus.readthedocs.io/en/latest/?badge=latest)
-
-[documentation](https://scfocus.readthedocs.io/en/latest/)
-
 ## **Installation**
 
 [![PyPI](https://img.shields.io/pypi/v/scfocus.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus/)
@@ -52,6 +46,14 @@ To identify distinct lineage branches within single-cell data, we employ the **S
 ``` bash
 pip install scfocus
 ```
+
+## **Documentation**
+
+The usage of `scfocus` in notebooks can be found in the documentation.
+
+[![Documentation Status](https://readthedocs.org/projects/scfocus/badge/?version=latest)](https://scfocus.readthedocs.io/en/latest/?badge=latest)
+
+[documentation](https://scfocus.readthedocs.io/en/latest/)
 
 ## **Streamlit UI**
 
