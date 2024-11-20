@@ -49,9 +49,9 @@ pip install scfocus
 
 ## **Documentation**
 
-The usage of `scfocus` in notebooks can be found in the [documentation](https://scfocus.readthedocs.io/en/latest/).
-
 [![Documentation Status](https://readthedocs.org/projects/scfocus/badge/?version=latest)](https://scfocus.readthedocs.io/en/latest/?badge=latest)
+
+The usage of `scfocus` in notebooks can be found in the [documentation](https://scfocus.readthedocs.io/en/latest/).
 
 ## **Streamlit UI**
 
