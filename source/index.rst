@@ -17,7 +17,7 @@ Features
 💗 We have developed an interactive website for **scFocus**, designed to help researchers easily perform data preprocessing, dimensionality reduction, and visualization. You can do the following:  
 
 1. **Upload Your Single-Cell Data**  
-   - Supports formats including `h5ad`, `h5`, `h5ad.gz`, `mtx`, `mtx.gz`, `loom`, `csv`, `txt`, `xlsx`, and `read_10x`.  
+   - Supports formats including `h5ad` and `10x`.  
 
 2. **Set Parameters**  
    - Configure settings such as:  
@@ -56,11 +56,12 @@ Installation
 
 .. toctree::
    :maxdepth: 1
-
    :hidden:
    :caption: TUTORIALS
 
    notebook/HematoAging
+   notebook/LungRegeneration
+   notebook/NeuronsRehabilatation
    notebook/4Datasets-t-SNE
 
 .. toctree::
