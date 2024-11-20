@@ -59,7 +59,7 @@ You can find example data in the data folder.
 
 Access the Web UI by [streamlit cloud app](https://scfocus.streamlit.app/).
 
-Command line tool is also available on linux
+Command line tool is also available on linux.
 
 ```bash
 scfocus ui
