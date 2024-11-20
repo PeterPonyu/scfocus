@@ -55,7 +55,7 @@ The usage of `scfocus` in notebooks can be found in the [documentation](https://
 
 ## **Streamlit UI**
 
-[Streamlit cloud app](https://scfocus.streamlit.app/).
+Access the Web UI by [streamlit cloud app](https://scfocus.streamlit.app/).
 
 Command line tool is also available on linux
 
