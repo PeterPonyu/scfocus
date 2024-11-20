@@ -54,6 +54,14 @@ Installation
 
     pip install scfocus
 
+.. toctree::
+   :maxdepth: 1
+
+   :hidden:
+   :caption: TUTORIALS
+
+   notebook/HematoAging
+   notebook/4Datasets-t-SNE
 
 .. toctree::
    :maxdepth: 2
