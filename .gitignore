@@ -26,3 +26,7 @@ venv/
 ENV/  
 .idea/  
 .vscode/
+# Ignore Jupyter notebook checkpoints  
+.ipynb_checkpoints/  
+# Ignore virtual documents  
+.virtual_documents/
