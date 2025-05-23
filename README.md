@@ -1,40 +1,10 @@
-# scFocus🔍  
+# scFocus  
 
-## About scFocus  
+## **Abstract**
 
-**scFocus** is an innovative approach that leverages reinforcement learning algorithms to conduct biologically meaningful analyses. By utilizing branch probabilities, scFocus enhances cell subtype discrimination without requiring prior knowledge of differentiation starting points or cell subtypes.  
+Single-cell transcriptomics captures cell differentiation trajectories through changes in gene expression intensity. However, it is challenging to obtain precise information on the composition of gene sets corresponding to each lineage branch in complex biological systems. The combination of branch probabilities and unsupervised clustering can effectively characterize changes in gene expression intensity, reflecting continuous cell states without relying on prior information. In this study, we propose a analytic algorithm named single-cell (sc)-Focus that divides cell subpopulations based on reinforcement learning and unsupervised branching in low-dimensional latent space of single cells. The lineage component strength of scFocus coincides with the expression regions of hallmark genes, capturing differentiation processes more effectively in comparison to the original low-dimensional latent space and showing a stronger subpopulation discriminative power. Furthermore, scFocus is applied to ten single-cell datasets, including small-scale datasets, common-scale datasets, and multi-batch datasets. This demonstrates its applicability on different types of datasets and showcases its potential in discovering biological changes due to experimental treatments through multi-batch dataset processing. Finally, an online analysis tool based on scFocus was developed, helping researchers and clinicians in the process and visualization of single-cell RNA sequencing data as well as the interpretation of these data through branch probabilities in a streamlined and intuitive way.
 
-To identify distinct lineage branches within single-cell data, we employ the **Soft Actor-Critic (SAC)** reinforcement learning framework, effectively addressing the non-differentiable challenges inherent in data-level problems. Through this methodology, we introduce a paradigm that harnesses reinforcement learning to achieve specific biological objectives in single-cell data analysis.  
-
-## Features  
-
-We have developed an interactive website for **scFocus**, designed to help researchers easily perform data preprocessing, dimensionality reduction, and visualization. You can do the following:  
-
-1. **Upload Your Single-Cell Data**  
-   - Supports formats including `h5ad`, `10x`. 
-
-2. **Set Parameters**  
-   - Configure settings such as:  
-     - Number of highly variable genes  
-     - Number of neighbors  
-     - Minimum distance  
-     - Number of branches  
-
-3. **Perform Preprocessing and Dimensionality Reduction Online**  
-   - Processes include:  
-     - Normalization  
-     - Logarithmizing  
-     - Highly variable genes selection  
-     - Preprocessing  
-     - UMAP embedding  
-     - scFocus analysis  
-
-4. **Choose Your Visualization Method**  
-   - Options include:  
-     - Dimensionality reduction plots  
-     - Heatmaps  
-   - Download the processed files for further analysis.  
-
+## **Graphical Abstract**
 <p align="center">  
   <img src="source/_static/Pattern.png" alt="Pattern Image" width="600"/>  
 </p>
@@ -73,7 +43,7 @@ scfocus ui
 </p>
 
 
-## **References**
+## **Cite**
 
 - Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). **scFocus: Detecting Branching Probabilities in Single-cell Data with SAC**. *Computational and Structural Biotechnology Journal*. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
 
