@@ -162,22 +162,113 @@ class Env:
         return state, err
     
 class ReplayBuffer:
+    """  
+    Replay buffer for storing and sampling transitions in reinforcement learning.  
+    
+    This buffer stores experience tuples (state, action, reward, next_state, done) and  
+    provides random sampling for off-policy learning algorithms.  
+    
+    Parameters  
+    ----------  
+    capacity : float or int  
+        Maximum number of transitions to store in the buffer. Older transitions  
+        are automatically removed when capacity is reached.  
+    
+    Attributes  
+    ----------  
+    buffer : collections.deque  
+        Double-ended queue storing the transitions with maximum length of capacity.  
+    """
    
     def __init__(self, capacity):
         self.buffer = collections.deque(maxlen=int(capacity))
         
     def add(self, state, action, reward, next_state, done):
+        """  
+        Add a transition to the replay buffer.  
+        
+        Parameters  
+        ----------  
+        state : numpy.ndarray  
+            Current state.  
+        action : numpy.ndarray  
+            Action taken.  
+        reward : float or numpy.ndarray  
+            Reward received.  
+        next_state : numpy.ndarray  
+            Next state after taking the action.  
+        done : bool or numpy.ndarray  
+            Whether the episode has terminated.  
+        """
         self.buffer.append((state, action, reward, next_state, done))
         
     def sample(self, batch_size):
+        """  
+        Sample a random batch of transitions from the buffer.  
+        
+        Parameters  
+        ----------  
+        batch_size : int  
+            Number of transitions to sample.  
+        
+        Returns  
+        -------  
+        tuple  
+            A tuple of (states, actions, rewards, next_states, dones) where each  
+            element is a numpy array of shape (batch_size, feature_dim).  
+        """
         transitions = random.sample(self.buffer, batch_size)
         state, action, reward, next_state, done = zip(*transitions)
         return np.vstack(state), np.vstack(action), np.vstack(reward), np.vstack(next_state), np.vstack(done)
     
     def size(self):
+        """  
+        Get the current number of transitions in the buffer.  
+        
+        Returns  
+        -------  
+        int  
+            Number of transitions currently stored in the buffer.  
+        """
         return len(self.buffer)
     
 def train_off_policy(env, agent, replay_buffer, num_episodes, minimal_size, batch_size):
+    """  
+    Train an off-policy reinforcement learning agent using experience replay.  
+    
+    This function executes the training loop for the SAC agent. It collects experiences  
+    by interacting with the environment, stores them in a replay buffer, and updates  
+    the agent's networks using random batches from the buffer. Training is organized  
+    into 10 segments with progress monitoring and early stopping based on convergence.  
+    
+    Parameters  
+    ----------  
+    env : Env  
+        The environment instance that the agent interacts with.  
+    agent : SAC  
+        The Soft Actor-Critic agent to be trained.  
+    replay_buffer : ReplayBuffer  
+        Buffer for storing and sampling experience transitions.  
+    num_episodes : float or int  
+        Total number of episodes to train for.  
+    minimal_size : float or int  
+        Minimum number of transitions in the replay buffer before training starts.  
+    batch_size : int  
+        Number of transitions to sample from the replay buffer for each update.  
+    
+    Returns  
+    -------  
+    return_list : list of numpy.ndarray  
+        List containing the cumulative return for each episode.  
+    err_list : list of numpy.ndarray  
+        List containing the cumulative error for each episode.  
+    
+    Notes  
+    -----  
+    The training automatically stops early if convergence is detected (when the  
+    standard deviation of errors in the last segment is less than 1% of the mean).  
+    Progress is displayed using tqdm progress bars for each training segment.  
+    """
    
     return_list = []
     err_list    = []

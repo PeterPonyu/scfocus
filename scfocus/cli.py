@@ -4,7 +4,25 @@ import os
 import subprocess  
 
 def run_streamlit():  
-    """Run the Streamlit application"""  
+    """  
+    Launch the Streamlit web application for scFocus.  
+    
+    This function locates the Analysis.py file in the scfocus package directory  
+    and launches it using the streamlit command-line interface.  
+    
+    Raises  
+    ------  
+    subprocess.CalledProcessError  
+        If the Streamlit application fails to launch.  
+    FileNotFoundError  
+        If Streamlit is not installed in the current environment.  
+    
+    Notes  
+    -----  
+    This function is called when the user runs `scfocus ui` from the command line.  
+    The Streamlit application provides an interactive web interface for analyzing  
+    single-cell data without writing code.  
+    """
     # Get the installation path of the current package  
     import scfocus  
     package_dir = os.path.dirname(os.path.abspath(scfocus.__file__))  
@@ -22,6 +40,19 @@ def run_streamlit():
         sys.exit(1)  
 
 def main():  
+    """  
+    Main entry point for the scFocus command-line interface.  
+    
+    This function parses command-line arguments and dispatches to the appropriate  
+    subcommand handler. Available commands include:  
+    
+    - ui: Launch the Streamlit web interface  
+    - process: Process single-cell data (planned for future release)  
+    - visualize: Visualize analysis results (planned for future release)  
+    
+    The function displays help information if no command is specified or if  
+    an invalid command is provided.  
+    """
     parser = argparse.ArgumentParser(  
         description='''  
         scFocus: Single Cell Reinforcement Learning for Lineage Focusing  
@@ -36,14 +67,14 @@ def main():
     subparsers = parser.add_subparsers(dest='command', help='Available commands')  
     
     # Subcommand for data processing  
-    process_parser = subparsers.add_parser('process', help='Process single cell data')  
+    process_parser = subparsers.add_parser('process', help='Process single cell data (coming soon)')  
     process_parser.add_argument('--input', '-i', type=str, required=True,  
                               help='Input file path (h5ad format)')  
     process_parser.add_argument('--output', '-o', type=str, default='output.h5ad',  
                               help='Output file path (default: output.h5ad)')  
     
     # Subcommand for visualization  
-    visualize_parser = subparsers.add_parser('visualize', help='Visualize results')  
+    visualize_parser = subparsers.add_parser('visualize', help='Visualize results (coming soon)')  
     visualize_parser.add_argument('--input', '-i', type=str, required=True,  
                                 help='Input file path (processed h5ad file)')  
     
@@ -54,9 +85,15 @@ def main():
     args = parser.parse_args()  
     
     if args.command == 'process':  
-        raise NotImplementedError("The 'process' command is not implemented yet.")  
+        raise NotImplementedError(
+            "The 'process' command is not implemented yet. "
+            "Please use the web interface (scfocus ui) or the Python API for now."
+        )
     elif args.command == 'visualize':  
-        raise NotImplementedError("The 'visualize' command is not implemented yet.")  
+        raise NotImplementedError(
+            "The 'visualize' command is not implemented yet. "
+            "Please use the web interface (scfocus ui) or the Python API for now."
+        )
     elif args.command == 'ui':  
         # Run the Streamlit application  
         run_streamlit()  
