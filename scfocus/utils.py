@@ -10,20 +10,26 @@ def preprocess(_adata, n_top_genes):
     """  
     Preprocess single-cell RNA-seq data using scanpy.  
     
-    This function performs standard preprocessing steps including normalization,  
-    logarithmic transformation, highly variable gene selection, and PCA.  
+    This function performs standard preprocessing steps including count normalization,  
+    log transformation, identification of highly variable genes, and PCA.  
     
     Parameters  
     ----------  
     _adata : anndata.AnnData  
         Annotated data matrix with cells as observations and genes as variables.  
+        Note: Despite the underscore prefix (required by Streamlit caching), this  
+        function modifies the AnnData object in place.
     n_top_genes : int  
-        Number of highly variable genes to select.  
+        Number of highly variable genes to identify.  
     
     Notes  
     -----  
-    This function modifies the input AnnData object in place and uses Streamlit's  
-    caching mechanism to avoid redundant computations.  
+    This function uses Streamlit's caching mechanism to avoid redundant computations.  
+    The preprocessing steps are:
+    1. Total count normalization to 10,000 counts per cell
+    2. Log transformation (log1p)
+    3. Highly variable gene identification
+    4. PCA on highly variable genes
     """
     with st.spinner("Normalizing total counts..."):
         sc.pp.normalize_total(_adata, target_sum=1e4)
