@@ -1,7 +1,7 @@
-import argparse  
-import sys  
-import os  
-import subprocess  
+import argparse
+import os
+import subprocess
+import sys
 
 def run_streamlit():  
     """  
@@ -39,7 +39,7 @@ def run_streamlit():
               file=sys.stderr)  
         sys.exit(1)  
 
-def main():  
+def main():
     """  
     Main entry point for the scFocus command-line interface.  
     
@@ -49,55 +49,52 @@ def main():
     - ui: Launch the Streamlit web interface  
     - process: Process single-cell data (planned for future release)  
     - visualize: Visualize analysis results (planned for future release)  
-    
-    The function displays help information if no command is specified or if  
-    an invalid command is provided.  
     """
-    parser = argparse.ArgumentParser(  
+    parser = argparse.ArgumentParser(
         description='''  
         scFocus: Single Cell Reinforcement Learning for Lineage Focusing  
         
         This tool processes single-cell data using reinforcement learning  
-        techniques to focus on relevant features and patterns on cell lineage.  
-        ''',  
-        formatter_class=argparse.RawDescriptionHelpFormatter  
-    )  
+        techniques to focus on relevant features and patterns in cell lineage.  
+        ''',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     
-    # Add subcommands  
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')  
+    # Add subcommands
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # Subcommand for data processing  
-    process_parser = subparsers.add_parser('process', help='Process single cell data (coming soon)')  
-    process_parser.add_argument('--input', '-i', type=str, required=True,  
-                              help='Input file path (h5ad format)')  
-    process_parser.add_argument('--output', '-o', type=str, default='output.h5ad',  
-                              help='Output file path (default: output.h5ad)')  
+    # Subcommand for data processing
+    process_parser = subparsers.add_parser('process', help='Process single cell data (coming soon)')
+    process_parser.add_argument('--input', '-i', type=str, required=True,
+                              help='Input file path (h5ad format)')
+    process_parser.add_argument('--output', '-o', type=str, default='output.h5ad',
+                              help='Output file path (default: output.h5ad)')
     
-    # Subcommand for visualization  
-    visualize_parser = subparsers.add_parser('visualize', help='Visualize results (coming soon)')  
-    visualize_parser.add_argument('--input', '-i', type=str, required=True,  
-                                help='Input file path (processed h5ad file)')  
+    # Subcommand for visualization
+    visualize_parser = subparsers.add_parser('visualize', help='Visualize results (coming soon)')
+    visualize_parser.add_argument('--input', '-i', type=str, required=True,
+                                help='Input file path (processed h5ad file)')
     
-    # Add streamlit subcommand  
-    streamlit_parser = subparsers.add_parser('ui',   
-                                           help='Launch the Streamlit web interface')  
+    # Add streamlit subcommand
+    streamlit_parser = subparsers.add_parser('ui',
+                                           help='Launch the Streamlit web interface')
     
-    args = parser.parse_args()  
+    args = parser.parse_args()
     
-    if args.command == 'process':  
+    if args.command == 'process':
         raise NotImplementedError(
             "The 'process' command is not implemented yet. "
             "Please use the web interface (scfocus ui) or the Python API for now."
         )
-    elif args.command == 'visualize':  
+    elif args.command == 'visualize':
         raise NotImplementedError(
             "The 'visualize' command is not implemented yet. "
             "Please use the web interface (scfocus ui) or the Python API for now."
         )
-    elif args.command == 'ui':  
-        # Run the Streamlit application  
-        run_streamlit()  
-    else:  
+    elif args.command == 'ui':
+        # Run the Streamlit application
+        run_streamlit()
+    else:
         parser.print_help()  
 
 if __name__ == '__main__':  

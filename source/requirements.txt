@@ -1,3 +1,4 @@
+# Requirements for building documentation with Sphinx
 scanpy>=1.7.1
 scipy>=1.5.2
 myst_parser>=0.15.2

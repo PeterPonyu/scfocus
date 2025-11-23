@@ -1,10 +1,11 @@
 import random
 import collections
-import tqdm
+
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import minmax_scale
+import tqdm
 from scipy.stats import multivariate_normal
+from sklearn.preprocessing import minmax_scale
 
 class Env:
     """  

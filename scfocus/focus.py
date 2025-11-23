@@ -1,12 +1,16 @@
-from .environment import Env, ReplayBuffer, train_off_policy
-from .model import SAC
+import time
+
 import numpy as np
 import torch
 import tqdm
-import time
 from scipy.stats import multivariate_normal
 from sklearn.preprocessing import minmax_scale
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')  
+
+from .environment import Env, ReplayBuffer, train_off_policy
+from .model import SAC
+
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+  
 
 class focus:  
     """  

@@ -1,11 +1,13 @@
-import streamlit as st
-import scanpy as sc
+import io
+import os
+import tempfile
+
 import matplotlib.pyplot as plt
 import numpy as np
+import scanpy as sc
 import seaborn as sns
-import joblib
-import io 
-import tempfile
+import streamlit as st
+
 from utils import read_files, preprocess, run_umap, run_tsne, run_focus
 
 st.markdown("<h1 style='text-align: center;'>scFocus 🔍 </h1>", unsafe_allow_html=True)  

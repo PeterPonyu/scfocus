@@ -1,9 +1,10 @@
-import streamlit as st
-import scanpy as sc
-import scfocus
 import os
 import tempfile
 from io import BytesIO
+
+import scanpy as sc
+import scfocus
+import streamlit as st
 
 @st.cache_data
 def preprocess(_adata, n_top_genes):
