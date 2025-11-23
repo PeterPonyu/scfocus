@@ -62,7 +62,7 @@ class Policynet(nn.Module):
   
     The log-probability of the generated actions is also computed and returned.  
     """  
-    def __init__(self, state_dim ,hidden_dim, action_dim, action_space):
+    def __init__(self, state_dim, hidden_dim, action_dim, action_space):
         super(Policynet, self).__init__()
         self.nn = nn.Sequential(nn.Linear(state_dim, hidden_dim),
                                nn.ReLU(),
