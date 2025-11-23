@@ -100,7 +100,7 @@ if st.session_state.adata is not None:
                 mfp2 = np.vstack(container)
                 fig = plt.figure(figsize=(5,5), dpi=300)
                 ax = sns.heatmap(mfp2, yticklabels=False, vmax=1, vmin=0, cmap='viridis')
-                ax.set_xticklabels([f'Fate_{i}' for i in range(mfp2.shape[1])])
+                ax.set_xticklabels([f'Fate_{i}' for i in range(mfp2.shape[1])], rotation=60, ha='right')
                 st.pyplot(fig)
         
      
