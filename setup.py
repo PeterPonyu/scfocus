@@ -15,7 +15,7 @@ setup(
     license='MIT',  
     packages=find_packages(),  
     install_requires=[  
-    	'scanpy>=1.10.4',
+        'scanpy>=1.10.4',
         'torch>=1.13.1',    
         'joblib>=1.2.0',  
         'tqdm>=4.64.1', 
@@ -27,7 +27,7 @@ setup(
         ],  
     },  
     package_data={  
-        'scfocus': ['Analysis.py'],  
+        'scfocus': ['*.py', 'pages/*.py', 'graphic_abstract.png'],  
     },  
     classifiers=[  
         'License :: OSI Approved :: MIT License',  
