@@ -126,7 +126,7 @@ class Env:
         """ 
         norms = np.zeros((self.n, self.n))
         for i in range(self.n - 1):
-            for j in range(i + 1, self.n - 1):
+            for j in range(i + 1, self.n):
                 norm = np.linalg.norm(states[i] - states[j])
                 norms[i, j] = norm
                 norms[j, i] = norm

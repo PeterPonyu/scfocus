@@ -1,9 +1,5 @@
 import streamlit as st  
-from matplotlib import font_manager  
 from pathlib import Path 
-
-font_path = '/mnt/data/file-ngwyeoEN29l1M3O1QpdxCwkj'  
-font_prop = font_manager.FontProperties(fname=font_path)  
 
 def main():  
     st.title('About scFocus🔍')  
