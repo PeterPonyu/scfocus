@@ -193,18 +193,7 @@ pip install -r requirements.txt
 
 ### Building Documentation
 
-The documentation is built using Sphinx. To build it locally:
-
-```bash
-# Install Sphinx and dependencies
-pip install sphinx sphinx-rtd-theme
-
-# Build the documentation
-cd source
-make html
-```
-
-The documentation will be built in `build/html/`.
+Documentation is built using Sphinx and hosted on Read the Docs. For local builds, refer to the Sphinx documentation.
 
 ## **License**
 <p>

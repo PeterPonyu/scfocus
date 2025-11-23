@@ -62,51 +62,7 @@ class focus:
     def __init__(self, f, hidden_dim=128, n=8, max_steps=5, pct_samples=.125, n_states=2,   
                  err_scale=1, bins=15, capacity=1e4, actor_lr=1e-4, critic_lr=1e-3,   
                  alpha_lr=1e-4, target_entropy=-1, tau=5e-3, gamma=.99,   
-                 num_episodes=1e3, batch_size=64, res=.05, device=torch.device('cpu')):  
-        """  
-        Initialize the Focus class.  
-
-        Parameters  
-        ----------  
-        f : array-like  
-            Latent space of the original data, with shape (num_samples, num_features).  
-        hidden_dim : int, optional  
-            Number of hidden units in the neural networks, by default 128.  
-        n : int, optional  
-            Number of agents or parallel environments, by default 8.  
-        max_steps : int, optional  
-            Maximum number of steps per episode, by default 5.  
-        pct_samples : float, optional  
-            Percentage of samples to use for each state, by default 0.125.  
-        n_states : int, optional  
-            Number of state variables, by default 2.  
-        err_scale : float, optional  
-            Error scaling factor for reward calculation, by default 1.  
-        bins : int, optional  
-            Number of bins for histogram-based state discretization, by default 15.  
-        capacity : float, optional  
-            Capacity of the replay buffer, by default 1e4.  
-        actor_lr : float, optional  
-            Learning rate for the actor network, by default 1e-4.  
-        critic_lr : float, optional  
-            Learning rate for the critic network, by default 1e-3.  
-        alpha_lr : float, optional  
-            Learning rate for the entropy coefficient, by default 1e-4.  
-        target_entropy : float, optional  
-            Target entropy for the SAC algorithm, by default -1.  
-        tau : float, optional  
-            Soft update coefficient for target networks, by default 5e-3.  
-        gamma : float, optional  
-            Discount factor for future rewards, by default 0.99.  
-        num_episodes : int, optional  
-            Number of training episodes, by default 1000.  
-        batch_size : int, optional  
-            Batch size for training, by default 64.  
-        res : float, optional  
-            Resolution parameter for merging focus patterns, by default 0.05.  
-        device : torch.device, optional  
-            Device to run the computations on (e.g., CPU or GPU), by default torch.device('cpu').  
-        """  
+                 num_episodes=1e3, batch_size=64, res=.05, device=torch.device('cpu'))  
         self.state_d        = (2 + bins) * n_states * n  
         self.hidden_dim     = hidden_dim  
         self.action_d       = 2 * n_states * n  
@@ -316,9 +272,7 @@ class focus:
         self : Focus  
             Returns the instance itself with updated entropy and pseudotime attributes.  
         """  
-        self.entropy = (self.mfp * -np.log(self.mfp)).sum(axis=1)  
+        self.entropy = (self.mfp[0] * -np.log(self.mfp[0] + 1e-10)).sum(axis=1)  
         self.pseudotime = 1 - minmax_scale(self.entropy)  
         return self
-        
-    
-        
+

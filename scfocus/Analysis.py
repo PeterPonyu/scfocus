@@ -54,7 +54,7 @@ if st.session_state.adata is not None:
         mfp = run_focus(st.session_state.embedding, n_branch)
         st.session_state.adata.obsm['mfp'] = mfp
         for i in range(mfp.shape[1]):
-            st.session_state.adata.obs[f'Fate_{i}'] = mfp[:,i]
+            st.session_state.adata.obs[f'Fate_{i}'] = mfp[:, i]
         st.session_state.processed = True
             
     if st.session_state.processed:
@@ -64,12 +64,18 @@ if st.session_state.adata is not None:
             adata.write_h5ad(tmp_file.name)
             tmp_file.seek(0)
             buffer = io.BytesIO()
-            with open(tmp_file.name,'rb')as f:
+            with open(tmp_file.name, 'rb') as f:
                 buffer.write(f.read())
         buffer.seek(0)
-        st.sidebar.download_button(label="Download scFocus Processed Data",data=buffer,file_name='adata.h5ad',mime='application/x-h5ad')
+        st.sidebar.download_button(
+            label="Download scFocus Processed Data",
+            data=buffer,
+            file_name='adata.h5ad',
+            mime='application/x-h5ad'
+        )
 
-        color = st.selectbox('Please select the observation for coloring', options=list(st.session_state.adata.obs))
+        color = st.selectbox('Please select the observation for coloring', 
+                            options=list(st.session_state.adata.obs))
         sc.pl.umap(st.session_state.adata, color=color, show=False)
         fig = plt.gcf()
         st.pyplot(fig)
@@ -77,7 +83,8 @@ if st.session_state.adata is not None:
         if st.sidebar.button("FateProbs"):
             sc.set_figure_params()
             mfp = st.session_state.adata.obsm['mfp']
-            sc.pl.umap(st.session_state.adata, color=[f'Fate_{i}' for i in range(mfp.shape[1])], show=False)
+            fate_columns = [f'Fate_{i}' for i in range(mfp.shape[1])]
+            sc.pl.umap(st.session_state.adata, color=fate_columns, show=False)
             fig = plt.gcf()
             st.pyplot(fig)
         
@@ -85,11 +92,11 @@ if st.session_state.adata is not None:
             mfp = st.session_state.adata.obsm['mfp']
             focus_labs = np.argmax(mfp, axis=1)
             st.session_state.adata.obs['focus_labels'] = focus_labs.astype(str)
-            with st.spinner("⏳Heatmap run..."):
-                mfp1 = mfp[np.argsort(np.argmax(mfp, axis=1)),:]
+            with st.spinner("⏳ Heatmap running..."):
+                mfp1 = mfp[np.argsort(np.argmax(mfp, axis=1)), :]
                 container = []
                 idxs = []
-                labels=[]
+                labels = []
                 
                 for i in range(mfp1.shape[1]):
                     idx = np.where(np.argmax(mfp1, axis=1) == i)[0]
@@ -98,7 +105,7 @@ if st.session_state.adata is not None:
                     container.append(mfp1[idx1, :])
                     labels.extend([str(i)] * len(idx1)) 
                 mfp2 = np.vstack(container)
-                fig = plt.figure(figsize=(5,5), dpi=300)
+                fig = plt.figure(figsize=(5, 5), dpi=300)
                 ax = sns.heatmap(mfp2, yticklabels=False, vmax=1, vmin=0, cmap='viridis')
                 ax.set_xticklabels([f'Fate_{i}' for i in range(mfp2.shape[1])], rotation=60, ha='right')
                 st.pyplot(fig)

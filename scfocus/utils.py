@@ -17,15 +17,13 @@ def preprocess(_adata, n_top_genes):
     ----------  
     _adata : anndata.AnnData  
         Annotated data matrix with cells as observations and genes as variables.  
-        Note: Despite the underscore prefix (required by Streamlit caching), this  
-        function modifies the AnnData object in place.
+        Modified in place.
     n_top_genes : int  
         Number of highly variable genes to identify.  
     
     Notes  
     -----  
-    This function uses Streamlit's caching mechanism to avoid redundant computations.  
-    The preprocessing steps are:
+    Preprocessing steps:
     1. Total count normalization to 10,000 counts per cell
     2. Log transformation (log1p)
     3. Highly variable gene identification
@@ -41,11 +39,11 @@ def preprocess(_adata, n_top_genes):
         
     with st.spinner("Selecting highly variable genes..."):
         sc.pp.highly_variable_genes(_adata, n_top_genes=int(n_top_genes))
-        _adata = _adata[:, _adata.var.highly_variable]
+        _adata._inplace_subset_var(_adata.var.highly_variable)
         st.success("Highly variable genes selected!")
         
     with st.spinner("Running PCA..."):
-        sc.pp.pca(_adata, mask_var='highly_variable')
+        sc.pp.pca(_adata)
         st.success("PCA completed!")
 
 @st.cache_data        
@@ -70,12 +68,13 @@ def run_umap(_adata, n_neighbors, min_dist):
     Notes  
     -----  
     This function first computes the neighborhood graph and then runs UMAP.  
-    Results are cached using Streamlit's caching mechanism.  
     """
     with st.spinner("Computing neighbors..."):
         sc.pp.neighbors(_adata, n_neighbors=int(n_neighbors))
+        st.success("Neighbors computed!")
     with st.spinner("Computing UMAP embedding..."):
         sc.tl.umap(_adata, min_dist=min_dist)
+        st.success("UMAP completed!")
     embedding = _adata.obsm['X_umap'].copy()
     return embedding
 
@@ -95,15 +94,10 @@ def run_tsne(_adata, perplexity):
     -------  
     embedding : numpy.ndarray  
         2D t-SNE embedding coordinates with shape (n_cells, 2).  
-    
-    Notes  
-    -----  
-    Results are cached using Streamlit's caching mechanism to avoid redundant  
-    computations across different runs.  
     """
     with st.spinner("Computing t-SNE embedding..."):
         sc.tl.tsne(_adata, perplexity=int(perplexity))
-    st.success("t-SNE completed!", icon="🎉")
+        st.success("t-SNE completed!", icon="🎉")
     embedding = _adata.obsm['X_tsne'].copy()
     return embedding
 
@@ -127,12 +121,6 @@ def run_focus(_embedding, n=6, pct_samples=.01, meta_focusing=3):
     -------  
     focus_probs : numpy.ndarray  
         Matrix of focus probabilities with shape (n_cells, n_branches).  
-    
-    Notes  
-    -----  
-    This function creates a scFocus object, performs meta-focusing iterations,  
-    merges focus patterns, and returns the final focus probability matrix.  
-    Results are cached to avoid redundant computations.  
     """
     with st.spinner("scFocus running..."):
         focus = scfocus.focus(_embedding, n=n, pct_samples=pct_samples).meta_focusing(n=meta_focusing)
@@ -159,11 +147,6 @@ def read_files(uploaded_files):
     -------  
     adata : anndata.AnnData or None  
         Annotated data matrix if successful, None otherwise.  
-    
-    Notes  
-    -----  
-    For 10x Genomics format, all three required files (matrix, features, barcodes)  
-    must be provided. Files can be compressed (.gz) or uncompressed.  
     """
     if len(uploaded_files) > 1:
         mtx_file = next((f for f in uploaded_files if 'matrix' in f.name.lower()), None)
@@ -211,7 +194,7 @@ def read_uploaded_file(uploaded_file):
     
     Notes  
     -----  
-    Currently only supports .h5ad format. Other formats will produce an error message.  
+    Currently only supports .h5ad format.
     """
     file_type = uploaded_file.name.rsplit('.', 1)[-1].lower()
     try:
@@ -241,11 +224,6 @@ def read_10x_files(mtx_file, features_file, barcodes_file):
     -------  
     adata : anndata.AnnData or None  
         Annotated data matrix if successful, None otherwise.  
-    
-    Notes  
-    -----  
-    Files are temporarily saved to disk for processing with scanpy's read_10x_mtx  
-    function. Temporary files are automatically cleaned up after reading.  
     """
     try:
         with tempfile.TemporaryDirectory() as tmpdirname:

@@ -162,6 +162,31 @@ class SAC:
     """  
     Implementation of the Soft Actor-Critic (SAC) algorithm for reinforcement learning.  
 
+    Parameters
+    ----------
+    state_dim : int  
+        Dimensionality of the state space.  
+    hidden_dim : int  
+        Dimensionality of the hidden layers in the neural networks.  
+    action_dim : int  
+        Dimensionality of the action space.
+    action_space : tuple
+        Tuple indicating the minimum and maximum action values (min_action, max_action).
+    actor_lr : float  
+        Learning rate for the actor.  
+    critic_lr : float  
+        Learning rate for the critics.  
+    alpha_lr : float  
+        Learning rate for the temperature parameter alpha.  
+    target_entropy : float  
+        Target entropy for the policy.  
+    tau : float  
+        Soft update factor for the target networks.  
+    gamma : float  
+        Discount factor.  
+    device : str or torch.device  
+        Device on which to run the computations (e.g., 'cuda' or 'cpu').
+
     Attributes  
     ----------  
     actor : Policynet  
@@ -198,33 +223,7 @@ class SAC:
     update(transition_dict)  
         Performs a training update using a batch of transitions.  
     """  
-    def __init__(self, state_dim, hidden_dim, action_dim, action_space, actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device):
-        """  
-        Initialize the SAC agent.  
-  
-        Parameters  
-        ----------  
-        state_dim : int  
-            Dimensionality of the state space.  
-        hidden_dim : int  
-            Dimensionality of the hidden layers in the neural networks.  
-        action_dim : int  
-            Dimensionality of the action space.  
-        actor_lr : float  
-            Learning rate for the actor.  
-        critic_lr : float  
-            Learning rate for the critics.  
-        alpha_lr : float  
-            Learning rate for the temperature parameter alpha.  
-        target_entropy : float  
-            Target entropy for the policy.  
-        tau : float  
-            Soft update factor for the target networks.  
-        gamma : float  
-            Discount factor.  
-        device : str or torch.device  
-            Device on which to run the computations (e.g., 'cuda' or 'cpu').  
-        """  
+    def __init__(self, state_dim, hidden_dim, action_dim, action_space, actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device)  
         self.actor                   = Policynet(state_dim, hidden_dim, action_dim, action_space).to(device) 
         self.critic_1                = Qnet(state_dim, hidden_dim, action_dim).to(device)
         self.critic_2                = Qnet(state_dim, hidden_dim, action_dim).to(device)
