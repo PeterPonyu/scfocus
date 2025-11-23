@@ -223,24 +223,24 @@ class SAC:
     update(transition_dict)  
         Performs a training update using a batch of transitions.  
     """  
-    def __init__(self, state_dim, hidden_dim, action_dim, action_space, actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device)  
-        self.actor                   = Policynet(state_dim, hidden_dim, action_dim, action_space).to(device) 
-        self.critic_1                = Qnet(state_dim, hidden_dim, action_dim).to(device)
-        self.critic_2                = Qnet(state_dim, hidden_dim, action_dim).to(device)
-        self.target_critic_1         = Qnet(state_dim, hidden_dim, action_dim).to(device)
-        self.target_critic_2         = Qnet(state_dim, hidden_dim, action_dim).to(device)
+    def __init__(self, state_dim, hidden_dim, action_dim, action_space, actor_lr, critic_lr, alpha_lr, target_entropy, tau, gamma, device):
+        self.actor = Policynet(state_dim, hidden_dim, action_dim, action_space).to(device) 
+        self.critic_1 = Qnet(state_dim, hidden_dim, action_dim).to(device)
+        self.critic_2 = Qnet(state_dim, hidden_dim, action_dim).to(device)
+        self.target_critic_1 = Qnet(state_dim, hidden_dim, action_dim).to(device)
+        self.target_critic_2 = Qnet(state_dim, hidden_dim, action_dim).to(device)
         self.target_critic_1.load_state_dict(self.critic_1.state_dict())
         self.target_critic_2.load_state_dict(self.critic_2.state_dict())
-        self.actor_optimizer         = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
-        self.critic_1_optimizer      = torch.optim.Adam(self.critic_1.parameters(), lr=critic_lr)
-        self.critic_2_optimizer      = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
-        self.log_alpha               = torch.tensor(np.log(.01), dtype=torch.float)
+        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
+        self.critic_1_optimizer = torch.optim.Adam(self.critic_1.parameters(), lr=critic_lr)
+        self.critic_2_optimizer = torch.optim.Adam(self.critic_2.parameters(), lr=critic_lr)
+        self.log_alpha = torch.tensor(np.log(.01), dtype=torch.float)
         self.log_alpha.requires_grad = True
-        self.log_alpha_optimizer     = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
-        self.target_entropy          = target_entropy
-        self.gamma                   = gamma
-        self.tau                     = tau
-        self.device                  = device
+        self.log_alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=alpha_lr)
+        self.target_entropy = target_entropy
+        self.gamma = gamma
+        self.tau = tau
+        self.device = device
         
     def take_action(self, state):
         """  

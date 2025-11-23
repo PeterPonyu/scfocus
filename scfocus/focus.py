@@ -62,30 +62,30 @@ class focus:
     def __init__(self, f, hidden_dim=128, n=8, max_steps=5, pct_samples=.125, n_states=2,   
                  err_scale=1, bins=15, capacity=1e4, actor_lr=1e-4, critic_lr=1e-3,   
                  alpha_lr=1e-4, target_entropy=-1, tau=5e-3, gamma=.99,   
-                 num_episodes=1e3, batch_size=64, res=.05, device=torch.device('cpu'))  
-        self.state_d        = (2 + bins) * n_states * n  
-        self.hidden_dim     = hidden_dim  
-        self.action_d       = 2 * n_states * n  
-        self.action_space   = (f[:, :n_states].min().item(), f[:, :n_states].max().item())  
-        self.actor_lr       = actor_lr  
-        self.critic_lr      = critic_lr  
-        self.alpha_lr       = alpha_lr  
-        self.target_entropy = target_entropy  
-        self.tau            = tau  
-        self.gamma          = gamma  
-        self.device         = device  
-        self.capacity       = capacity  
-        self.ensemble       = []  
-        self.env            = Env(n, f, max_steps, pct_samples, n_states, err_scale, bins)  
-        self.memory         = []  
-        self.max_steps      = max_steps  
-        self.num_episodes   = num_episodes  
-        self.minimal_size   = num_episodes / 10 * max_steps  
-        self.batch_size     = batch_size  
-        self.res            = res  
-        self.fp             = []  
-        self.r              = []  
-        self.e              = []  
+                 num_episodes=1e3, batch_size=64, res=.05, device=torch.device('cpu')):
+        self.state_d = (2 + bins) * n_states * n
+        self.hidden_dim = hidden_dim
+        self.action_d = 2 * n_states * n
+        self.action_space = (f[:, :n_states].min().item(), f[:, :n_states].max().item())
+        self.actor_lr = actor_lr
+        self.critic_lr = critic_lr
+        self.alpha_lr = alpha_lr
+        self.target_entropy = target_entropy
+        self.tau = tau
+        self.gamma = gamma
+        self.device = device
+        self.capacity = capacity
+        self.ensemble = []
+        self.env = Env(n, f, max_steps, pct_samples, n_states, err_scale, bins)
+        self.memory = []
+        self.max_steps = max_steps
+        self.num_episodes = num_episodes
+        self.minimal_size = num_episodes / 10 * max_steps
+        self.batch_size = batch_size
+        self.res = res
+        self.fp = []
+        self.r = []
+        self.e = []  
 
     def meta_focusing(self, n):  
         """  

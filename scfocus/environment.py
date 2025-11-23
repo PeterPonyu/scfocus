@@ -28,16 +28,15 @@ class Env:
         Number of bins for histogram-based state discretization.  
     """  
     def __init__(self, n, f, max_steps, pct_samples, n_states, err_scale, bins):
-        
-        self.n                   = n
-        self.f                   = f
-        self.max_steps           = max_steps
-        self.n_samples           = int(f.shape[0]*pct_samples)
-        self.n_states            = n_states
-        self.err_scale           = err_scale
-        self.bins                = bins
-        self.sigma               = f[:, :n_states].std(axis=0).max()
-        self.value_list          = []
+        self.n = n
+        self.f = f
+        self.max_steps = max_steps
+        self.n_samples = int(f.shape[0] * pct_samples)
+        self.n_states = n_states
+        self.err_scale = err_scale
+        self.bins = bins
+        self.sigma = f[:, :n_states].std(axis=0).max()
+        self.value_list = []
         
 
     def reset(self):
@@ -154,11 +153,12 @@ class Env:
             state_bins = minmax_scale(np.histogram(f_[:, i], bins=self.bins)[0])
             state_bins_ls.append(state_bins)
         f_bins = np.hstack(state_bins_ls)
-        state  = np.hstack([f_bins,
-                           f_[:, :self.n_states].mean(axis=0),
-                           f_[:, :self.n_states].std(axis=0)
-                           ])
-        err    = sum([f_[:, i].std() for i in range(self.n_states)]) / self.n_states
+        state = np.hstack([
+            f_bins,
+            f_[:, :self.n_states].mean(axis=0),
+            f_[:, :self.n_states].std(axis=0)
+        ])
+        err = sum([f_[:, i].std() for i in range(self.n_states)]) / self.n_states
         return state, err
     
 class ReplayBuffer:
@@ -267,19 +267,17 @@ def train_off_policy(env, agent, replay_buffer, num_episodes, minimal_size, batc
     -----  
     The training automatically stops early if convergence is detected (when the  
     standard deviation of errors in the last segment is less than 1% of the mean).  
-    Progress is displayed using tqdm progress bars for each training segment.  
     """
-   
     return_list = []
-    err_list    = []
-    one_episode = int(num_episodes/10)
+    err_list = []
+    one_episode = int(num_episodes / 10)
     for i in range(10):
-        with tqdm.tqdm(total=one_episode, desc='Meta fitting... %d'%(i+1)) as pbar:
+        with tqdm.tqdm(total=one_episode, desc='Meta fitting... %d' % (i + 1)) as pbar:
             for i_episode in range(one_episode):
-                state          = env.reset()
+                state = env.reset()
                 episode_return = 0
-                episode_err    = env.err
-                done           = False
+                episode_err = env.err
+                done = False
                 while not done:
                     action = agent.take_action(state)
                     next_state, reward, done = env.step(action)
@@ -291,19 +289,23 @@ def train_off_policy(env, agent, replay_buffer, num_episodes, minimal_size, batc
                 err_list.append(episode_err)
                 if replay_buffer.size() > minimal_size:
                     b_s, b_a, b_r, b_ns, b_d = replay_buffer.sample(batch_size)
-                    transition_dict = {'states':b_s, 'actions':b_a, 'next_states':b_ns, 'rewards':b_r,'dones':b_d}
+                    transition_dict = {
+                        'states': b_s,
+                        'actions': b_a,
+                        'next_states': b_ns,
+                        'rewards': b_r,
+                        'dones': b_d
+                    }
                     agent.update(transition_dict)
-                if (i_episode+1) % 10 == 0:
-                    pbar.set_postfix({'E':'%d' % (one_episode*i+i_episode+1),
-                                     'R':'%.2f'%np.mean(return_list[-10:]),
-                                     'S':'%.2f'%np.mean(err_list[-10:])
-                                     })
+                if (i_episode + 1) % 10 == 0:
+                    pbar.set_postfix({
+                        'E': '%d' % (one_episode * i + i_episode + 1),
+                        'R': '%.2f' % np.mean(return_list[-10:]),
+                        'S': '%.2f' % np.mean(err_list[-10:])
+                    })
                 pbar.update(1)
-            if i > 5 and .01*np.array(err_list[-one_episode:]).mean() > np.array(err_list[-one_episode:]).std():
-                print(f'Converged at iteration {i+1}. Training stopped!')
+            if i > 5 and .01 * np.array(err_list[-one_episode:]).mean() > np.array(err_list[-one_episode:]).std():
+                print(f'Converged at iteration {i + 1}. Training stopped!')
                 break
     return return_list, err_list
-
-
-
 
