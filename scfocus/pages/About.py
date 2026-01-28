@@ -23,7 +23,7 @@ def main():
     st.header('Graphical Abstract')
     current_dir = Path(__file__).parent  
     image_path = current_dir.parent / 'graphic_abstract.png'  
-    st.image(str(image_path), caption='scFocus workflow overview', width=800)
+    st.image(str(image_path), caption='scFocus workflow overview', use_container_width=True)
 
 if __name__ == '__main__':  
     main()

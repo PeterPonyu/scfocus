@@ -30,7 +30,7 @@ if 'processed' not in st.session_state:
 if not st.session_state.adata:
     uploaded_files = st.sidebar.file_uploader("Sequencing files", accept_multiple_files=True)
     if len(uploaded_files) < 1:
-        st.info("Please upload your single-cell data files to begin analysis.")
+        st.warning("Please upload your single-cell data files to begin analysis.")
     else:
         st.session_state.adata = read_files(uploaded_files)
 
