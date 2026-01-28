@@ -103,7 +103,7 @@ def run_tsne(_adata, perplexity):
     """
     with st.spinner("Computing t-SNE embedding..."):
         sc.tl.tsne(_adata, perplexity=int(perplexity))
-    st.success("t-SNE completed!", icon="🎉")
+    st.success("t-SNE completed!")
     embedding = _adata.obsm['X_tsne'].copy()
     return embedding
 
@@ -134,10 +134,10 @@ def run_focus(_embedding, n=6, pct_samples=.01, meta_focusing=3):
     merges focus patterns, and returns the final focus probability matrix.  
     Results are cached to avoid redundant computations.  
     """
-    with st.spinner("scFocus running..."):
+    with st.spinner("Running scFocus analysis..."):
         focus = scfocus.focus(_embedding, n=n, pct_samples=pct_samples).meta_focusing(n=meta_focusing)
         focus.merge_fp2()
-        st.success("scFocus completed!", icon="🎉")
+        st.success("scFocus analysis completed!")
     return focus.mfp[0]
 
 
@@ -174,25 +174,24 @@ def read_files(uploaded_files):
             with st.spinner("Loading 10x Genomics data..."):
                 adata = read_10x_files(mtx_file, features_file, barcodes_file)
             if adata is not None:
-                st.success("10x Genomics files read successfully! 🎉")
+                st.success("10x Genomics files loaded successfully.")
                 st.write(adata)
                 return adata
         else:
             st.error(
                 "Please upload all required 10x Genomics files: "
                 "`matrix.mtx`/`matrix.mtx.gz`, `features.tsv`/`features.tsv.gz`, "
-                "and `barcodes.tsv`/`barcodes.tsv.gz`.",
-                icon="🤔"
+                "and `barcodes.tsv`/`barcodes.tsv.gz`."
             )
     elif len(uploaded_files) == 1:
-        with st.spinner("Loading single file..."):
+        with st.spinner("Loading file..."):
             adata = read_uploaded_file(uploaded_files[0])
         if adata is not None:
-            st.success("File read successfully! 🎉")
+            st.success("File loaded successfully.")
             st.write(adata)
             return adata
     else:
-        st.error("No files uploaded.", icon="🚨")
+        st.error("No files uploaded.")
     return None
 
 def read_uploaded_file(uploaded_file):
@@ -218,10 +217,10 @@ def read_uploaded_file(uploaded_file):
         if file_type == 'h5ad':
             return sc.read_h5ad(BytesIO(uploaded_file.read()))
         else:
-            st.error(f"Unsupported file type: `{file_type}`", icon="🤔")
+            st.error(f"Unsupported file type: `{file_type}`")
             return None
     except Exception as e:
-        st.error(f"Failed to read `{file_type}` file: {e}", icon="🤔")
+        st.error(f"Failed to read `{file_type}` file: {e}")
         return None
 
 def read_10x_files(mtx_file, features_file, barcodes_file):
@@ -276,5 +275,5 @@ def read_10x_files(mtx_file, features_file, barcodes_file):
             adata = sc.read_10x_mtx(tmpdirname, var_names='gene_symbols', cache=True)
             return adata
     except Exception as e:
-        st.error(f"Failed to read 10x Genomics files: {e}", icon="🤔")
+        st.error(f"Failed to read 10x Genomics files: {e}")
         return None

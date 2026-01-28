@@ -6,9 +6,19 @@ import seaborn as sns
 import joblib
 import io 
 import tempfile
-from utils import read_files, preprocess, run_umap, run_tsne, run_focus
+import sys
+import os
 
-st.markdown("<h1 style='text-align: center;'>scFocus 🔍 </h1>", unsafe_allow_html=True)  
+# Handle imports for both direct execution and package import
+try:
+    from .utils import read_files, preprocess, run_umap, run_tsne, run_focus
+except ImportError:
+    # Add parent directory to path for direct execution
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from utils import read_files, preprocess, run_umap, run_tsne, run_focus
+
+st.set_page_config(page_title="scFocus", page_icon="🔬", layout="wide")
+st.markdown("<h1 style='text-align: center;'>scFocus</h1>", unsafe_allow_html=True)
 
 if 'adata' not in st.session_state:  
     st.session_state.adata = None  
@@ -18,11 +28,11 @@ if 'processed' not in st.session_state:
     st.session_state.processed = False  
 
 if not st.session_state.adata:
-    uploaded_files = st.sidebar.file_uploader("📁 Sequencing files", accept_multiple_files=True)
+    uploaded_files = st.sidebar.file_uploader("Sequencing files", accept_multiple_files=True)
     if len(uploaded_files) < 1:
-        st.warning("Please upload your files first!", icon="⚠")
+        st.warning("Please upload your single-cell data files to begin analysis.")
     else:
-        st.session_state.adata = read_files(uploaded_files)  
+        st.session_state.adata = read_files(uploaded_files)
 
 if st.session_state.adata is not None:
 
@@ -85,7 +95,7 @@ if st.session_state.adata is not None:
             mfp = st.session_state.adata.obsm['mfp']
             focus_labs = np.argmax(mfp, axis=1)
             st.session_state.adata.obs['focus_labels'] = focus_labs.astype(str)
-            with st.spinner("⏳Heatmap run..."):
+            with st.spinner("Generating heatmap..."):
                 mfp1 = mfp[np.argsort(np.argmax(mfp, axis=1)),:]
                 container = []
                 idxs = []

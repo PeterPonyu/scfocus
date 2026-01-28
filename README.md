@@ -1,15 +1,15 @@
 # scFocus  
 
-## **Abstract**
+## Abstract
 
-Single-cell transcriptomics captures cell differentiation trajectories through changes in gene expression intensity. However, it is challenging to obtain precise information on the composition of gene sets corresponding to each lineage branch in complex biological systems. The combination of branch probabilities and unsupervised clustering can effectively characterize changes in gene expression intensity, reflecting continuous cell states without relying on prior information. In this study, we propose a analytic algorithm named single-cell (sc)-Focus that divides cell subpopulations based on reinforcement learning and unsupervised branching in low-dimensional latent space of single cells. The lineage component strength of scFocus coincides with the expression regions of hallmark genes, capturing differentiation processes more effectively in comparison to the original low-dimensional latent space and showing a stronger subpopulation discriminative power. Furthermore, scFocus is applied to ten single-cell datasets, including small-scale datasets, common-scale datasets, and multi-batch datasets. This demonstrates its applicability on different types of datasets and showcases its potential in discovering biological changes due to experimental treatments through multi-batch dataset processing. Finally, an online analysis tool based on scFocus was developed, helping researchers and clinicians in the process and visualization of single-cell RNA sequencing data as well as the interpretation of these data through branch probabilities in a streamlined and intuitive way.
+Single-cell transcriptomics captures cell differentiation trajectories through changes in gene expression intensity. However, it is challenging to obtain precise information on the composition of gene sets corresponding to each lineage branch in complex biological systems. The combination of branch probabilities and unsupervised clustering can effectively characterize changes in gene expression intensity, reflecting continuous cell states without relying on prior information. In this study, we propose an analytic algorithm named single-cell (sc)-Focus that divides cell subpopulations based on reinforcement learning and unsupervised branching in low-dimensional latent space of single cells. The lineage component strength of scFocus coincides with the expression regions of hallmark genes, capturing differentiation processes more effectively in comparison to the original low-dimensional latent space and showing a stronger subpopulation discriminative power. Furthermore, scFocus is applied to ten single-cell datasets, including small-scale datasets, common-scale datasets, and multi-batch datasets. This demonstrates its applicability on different types of datasets and its potential in discovering biological changes due to experimental treatments through multi-batch dataset processing. An online analysis tool based on scFocus was developed to assist researchers in the processing and visualization of single-cell RNA sequencing data.
 
-## **Graphical Abstract**
+## Graphical Abstract
 <p align="center">  
   <img src="source/_static/Pattern.png" alt="Pattern Image" width="600"/>  
 </p>
 
-## **Installation**
+## Installation
 
 [![PyPI](https://img.shields.io/pypi/v/scfocus.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus/)
 
@@ -32,9 +32,9 @@ cd scfocus
 pip install -e .
 ```
 
-## **Quick Start**
+## Quick Start
 
-Here's a simple example to get started with scFocus:
+Basic example to get started with scFocus:
 
 ```python
 import scanpy as sc
@@ -69,7 +69,7 @@ for i in range(focus.mfp[0].shape[1]):
 sc.pl.umap(adata, color=[f'Fate_{i}' for i in range(focus.mfp[0].shape[1])])
 ```
 
-## **Key Parameters**
+## Key Parameters
 
 The `focus` class accepts the following key parameters:
 
@@ -83,19 +83,19 @@ The `focus` class accepts the following key parameters:
 
 For a complete list of parameters and their descriptions, see the [API documentation](https://scfocus.readthedocs.io/en/latest/).
 
-## **Documentation**
+## Documentation
 
 [![Documentation Status](https://readthedocs.org/projects/scfocus/badge/?version=latest)](https://scfocus.readthedocs.io/en/latest/?badge=latest)
 
-Comprehensive tutorials and API documentation can be found in our [documentation](https://scfocus.readthedocs.io/en/latest/), including:
+Tutorials and API documentation are available at [https://scfocus.readthedocs.io/en/latest/](https://scfocus.readthedocs.io/en/latest/), including:
 
-- Detailed notebooks for different datasets
+- Notebooks for different datasets
 - Step-by-step tutorials
 - API reference
 
-## **Streamlit Web Interface**
+## Web Interface
 
-scFocus provides an interactive web interface for easy data analysis without coding.
+scFocus provides an interactive web interface for data analysis.
 
 ### Online Access
 
@@ -103,7 +103,7 @@ Access the hosted version at [scfocus.streamlit.app](https://scfocus.streamlit.a
 
 ### Local Interface
 
-Launch the local web interface (Linux and macOS):
+Launch the local web interface:
 
 ```bash
 scfocus ui
@@ -117,13 +117,13 @@ scfocus ui
    - Number of neighbors for UMAP (2-50, default: 15)
    - Minimum distance for UMAP (0.0-2.0, default: 0.5)
    - Number of branches (2-10, default: 6)
-3. **Process**: Click "Process" to run the full analysis pipeline
+3. **Process**: Click "Process" to run the analysis pipeline
 4. **Visualize**: View UMAP plots colored by cell fate probabilities
 5. **Download**: Export processed data as `.h5ad` file
 
 Example datasets are available in the `data/` folder of the repository.
 
-## **Command Line Interface (CLI)**
+## Command Line Interface
 
 ### Available Commands
 
@@ -131,16 +131,16 @@ Example datasets are available in the `data/` folder of the repository.
 # Launch web interface
 scfocus ui
 
-# Process single-cell data (coming soon)
+# Process single-cell data (planned)
 # scfocus process --input data.h5ad --output results.h5ad
 
-# Visualize results (coming soon)
+# Visualize results (planned)
 # scfocus visualize --input results.h5ad
 ```
 
 Note: `process` and `visualize` commands are planned for future releases.
 
-## **Workflow Overview**
+## Workflow Overview
 
 The typical scFocus workflow consists of:
 
@@ -150,12 +150,12 @@ The typical scFocus workflow consists of:
 4. **Merge Patterns**: Consolidate similar focus patterns
 5. **Visualization**: Display cell fate probabilities and branch assignments
 
-## **Troubleshooting**
+## Troubleshooting
 
 ### Common Issues
 
 **Issue**: `ModuleNotFoundError: No module named 'torch'`
-- **Solution**: Ensure PyTorch is installed: `pip install torch>=1.13.1`
+- **Solution**: Install PyTorch: `pip install torch>=1.13.1`
 
 **Issue**: CUDA out of memory error
 - **Solution**: The algorithm automatically uses CPU if GPU is unavailable. For large datasets, consider reducing `n` (number of agents) or `pct_samples`.
@@ -163,11 +163,11 @@ The typical scFocus workflow consists of:
 **Issue**: Streamlit command not found
 - **Solution**: Install streamlit: `pip install streamlit>=1.24.0`
 
-**Issue**: Analysis is very slow
+**Issue**: Analysis is slow
 - **Solution**: 
-  - Reduce `num_episodes` (default 1000) for faster but less refined results
+  - Reduce `num_episodes` (default 1000) for faster results
   - Decrease `n` (number of agents) to reduce computational load
-  - Use GPU if available for faster training
+  - Use GPU if available
 
 ### Getting Help
 
@@ -175,7 +175,7 @@ The typical scFocus workflow consists of:
 - Open an issue on [GitHub](https://github.com/PeterPonyu/scfocus/issues)
 - Review example notebooks in the documentation
 
-## **Development**
+## Development
 
 ### Setting Up Development Environment
 
@@ -187,13 +187,13 @@ cd scfocus
 # Install in development mode
 pip install -e .
 
-# Install additional development dependencies (if any)
+# Install additional development dependencies
 pip install -r requirements.txt
 ```
 
 ### Building Documentation
 
-The documentation is built using Sphinx. To build it locally:
+The documentation is built using Sphinx:
 
 ```bash
 # Install Sphinx and dependencies
@@ -206,7 +206,7 @@ make html
 
 The documentation will be built in `build/html/`.
 
-## **License**
+## License
 <p>
     <a href="https://choosealicense.com/licenses/mit/" target="_blank">
         <img alt="license" src="https://img.shields.io/github/license/PeterPonyu/scfocus?style=flat-square&color=brightgreen"/>
@@ -214,7 +214,7 @@ The documentation will be built in `build/html/`.
 </p>
 
 
-## **Cite**
+## Citation
 
-- Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). **scFocus: Detecting Branching Probabilities in Single-cell Data with SAC**. *Computational and Structural Biotechnology Journal*. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
+Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). scFocus: Detecting Branching Probabilities in Single-cell Data with SAC. *Computational and Structural Biotechnology Journal*. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
 
