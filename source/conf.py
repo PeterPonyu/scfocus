@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.abspath('../'))
 import scfocus
 
 project = 'scfocus'
-copyright = '2024, Zeyu Fu'
+copyright = '2025, Zeyu Fu'
 author = 'Zeyu Fu'
 release = scfocus.__version__
 
