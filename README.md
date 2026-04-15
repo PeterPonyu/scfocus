@@ -1,3 +1,9 @@
+<div align="center">
+  <a href="https://peterponyu.github.io/">
+    <img src="https://peterponyu.github.io/assets/badges/scfocus.svg" width="64" alt="ZF Lab · scfocus">
+  </a>
+</div>
+
 # scFocus  
 
 ## Abstract
