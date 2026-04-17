@@ -1,8 +1,8 @@
 # scFocus  
 
-## Abstract
+## Overview
 
-Single-cell transcriptomics captures cell differentiation trajectories through changes in gene expression intensity. However, it is challenging to obtain precise information on the composition of gene sets corresponding to each lineage branch in complex biological systems. The combination of branch probabilities and unsupervised clustering can effectively characterize changes in gene expression intensity, reflecting continuous cell states without relying on prior information. In this study, we propose an analytic algorithm named single-cell (sc)-Focus that divides cell subpopulations based on reinforcement learning and unsupervised branching in low-dimensional latent space of single cells. The lineage component strength of scFocus coincides with the expression regions of hallmark genes, capturing differentiation processes more effectively in comparison to the original low-dimensional latent space and showing a stronger subpopulation discriminative power. Furthermore, scFocus is applied to ten single-cell datasets, including small-scale datasets, common-scale datasets, and multi-batch datasets. This demonstrates its applicability on different types of datasets and its potential in discovering biological changes due to experimental treatments through multi-batch dataset processing. An online analysis tool based on scFocus was developed to assist researchers in the processing and visualization of single-cell RNA sequencing data.
+scFocus is a reinforcement-learning-based method for analyzing lineage branching in low-dimensional single-cell embeddings. It combines branch probabilities with unsupervised structure in the latent space to help characterize continuous cell-state transitions and related visualization workflows.
 
 ## Graphical Abstract
 <p align="center">  
@@ -131,14 +131,8 @@ Example datasets are available in the `data/` folder of the repository.
 # Launch web interface
 scfocus ui
 
-# Process single-cell data (planned)
-# scfocus process --input data.h5ad --output results.h5ad
-
-# Visualize results (planned)
-# scfocus visualize --input results.h5ad
+# Additional CLI commands may be added in future releases
 ```
-
-Note: `process` and `visualize` commands are planned for future releases.
 
 ## Workflow Overview
 
@@ -217,4 +211,3 @@ The documentation will be built in `build/html/`.
 ## Citation
 
 Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). scFocus: Detecting Branching Probabilities in Single-cell Data with SAC. *Computational and Structural Biotechnology Journal*. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
-
