@@ -216,4 +216,4 @@ The documentation will be built in `build/html/`.
 
 ## Citation
 
-Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). scFocus: Detecting Branching Probabilities in Single-cell Data with SAC. *Computational and Structural Biotechnology Journal*. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
+Chen, C., Fu, Z., Yang, J., Chen, H., Huang, J., Qin, S., Wang, C., & Hu, X. (2025). scFocus: Detecting Branching Probabilities in Single-cell Data with SAC. *Computational and Structural Biotechnology Journal*, 27, 2243–2263. [https://doi.org/10.1016/j.csbj.2025.04.036](https://doi.org/10.1016/j.csbj.2025.04.036)
