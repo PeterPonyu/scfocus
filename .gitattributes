@@ -1,0 +1,6 @@
+# Release archives (which Zenodo deposits) carry code and docs only.
+# The example data, the screen-recorded guide and the full-resolution
+# graphical abstract stay in git; the package ships a 1600 px copy.
+data/ export-ignore
+*.mp4 export-ignore
+/graphic_abstract.png export-ignore
