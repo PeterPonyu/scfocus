@@ -17,7 +17,7 @@ scFocus is a reinforcement-learning-based method for analyzing lineage branching
 
 ## Installation
 
-[![PyPI](https://img.shields.io/pypi/v/scfocus.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus/)
+[![PyPI](https://img.shields.io/pypi/v/scfocus-sc.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus-sc/)
 
 ### Requirements
 
@@ -27,8 +27,10 @@ scFocus is a reinforcement-learning-based method for analyzing lineage branching
 ### Install from PyPI
 
 ``` bash
-pip install scfocus
+pip install scfocus-sc
 ```
+
+From version 0.0.6 the package is published on PyPI as `scfocus-sc`; the import name is still `scfocus`. The earlier `scfocus` project on PyPI stays at 0.0.5 and is no longer updated.
 
 ### Install from source
 

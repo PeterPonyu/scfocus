@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()  
 
 setup(  
-    name='scfocus',  
+    name='scfocus-sc',  
     version='0.0.6',  
     description='single cell reinforcement learning for focusing',  
     long_description=long_description,  

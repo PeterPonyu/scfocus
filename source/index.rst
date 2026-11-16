@@ -30,7 +30,7 @@ Installation
 
 .. code-block:: bash
 
-    pip install scfocus
+    pip install scfocus-sc
 
 Quick Start
 -----------
