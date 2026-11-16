@@ -4,3 +4,9 @@
 data/ export-ignore
 *.mp4 export-ignore
 /graphic_abstract.png export-ignore
+# The application notebooks carry large embedded outputs and are rendered on Read the Docs,
+# and the 7.7 MB docs figure is shown from GitHub; both stay in git.
+source/notebook/HematoAging.ipynb export-ignore
+source/notebook/LungRegeneration.ipynb export-ignore
+source/notebook/NeuronsRehabilatation.ipynb export-ignore
+source/_static/Pattern.png export-ignore

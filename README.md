@@ -12,7 +12,7 @@ scFocus is a reinforcement-learning-based method for analyzing lineage branching
 
 ## Graphical Abstract
 <p align="center">  
-  <img src="source/_static/Pattern.png" alt="Pattern Image" width="600"/>  
+  <img src="https://raw.githubusercontent.com/PeterPonyu/scfocus/main/source/_static/Pattern.png" alt="Pattern Image" width="600"/>  
 </p>
 
 ## Installation
