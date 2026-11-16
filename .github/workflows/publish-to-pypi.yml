@@ -9,6 +9,12 @@ jobs:
   build-and-publish:
     name: Build and publish Python distribution to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/scfocus-sc/
+    permissions:
+      id-token: write  # PyPI trusted publishing
+      contents: read
 
     steps:
       - name: Checkout code
@@ -44,12 +50,4 @@ jobs:
 
       - name: Publish to PyPI
         if: github.event_name == 'release'
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          if [ -z "$TWINE_PASSWORD" ]; then
-            echo "Error: the PYPI_API_TOKEN repository secret is not set"
-            exit 1
-          fi
-          twine upload dist/*
+        uses: pypa/gh-action-pypi-publish@release/v1
