@@ -6,6 +6,9 @@
 
 # scFocus  
 
+[![PyPI](https://img.shields.io/pypi/v/scfocus-sc.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus-sc/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24268611.svg)](https://doi.org/10.5281/zenodo.24268611)
+
 ## Overview
 
 scFocus is a reinforcement-learning-based method for analyzing lineage branching in low-dimensional single-cell embeddings. It combines branch probabilities with unsupervised structure in the latent space to help characterize continuous cell-state transitions and related visualization workflows.
@@ -16,8 +19,6 @@ scFocus is a reinforcement-learning-based method for analyzing lineage branching
 </p>
 
 ## Installation
-
-[![PyPI](https://img.shields.io/pypi/v/scfocus-sc.svg?color=brightgreen&style=flat)](https://pypi.org/project/scfocus-sc/)
 
 ### Requirements
 

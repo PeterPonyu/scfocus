@@ -6,10 +6,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(  
     name='scfocus-sc',  
     version='0.0.6',  
-    description='single cell reinforcement learning for focusing',  
+    description='scFocus: detecting branching probabilities in single-cell data with SAC',  
     long_description=long_description,  
     long_description_content_type="text/markdown",  
     url='https://github.com/PeterPonyu/scfocus',  
+    project_urls={
+        'Documentation': 'https://scfocus.readthedocs.io',
+        'Source': 'https://github.com/PeterPonyu/scfocus',
+        'Paper': 'https://doi.org/10.1016/j.csbj.2025.04.036',
+        'Issues': 'https://github.com/PeterPonyu/scfocus/issues',
+    },
     author='Zeyu Fu',  
     author_email='fuzeyu99@126.com',  
     license='MIT',  
